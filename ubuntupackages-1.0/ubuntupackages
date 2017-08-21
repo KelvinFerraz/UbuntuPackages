@@ -1,0 +1,75 @@
+#!/bin/bash
+
+
+#	 UbuntuPackages - Automated software install and configuration for Ubuntu.
+#    Copyright (C) 2017  Kelvin Ferraz - kelvinferrazsilva@gmail.com
+#	 Version 1.0
+#
+#	 This script is inspired and used some code of easyLife for Fedora. 
+#	 Development by Luis Felipe B. Marzagão
+#
+#    This program is free software: you can redistribute it and/or modify
+#    it under the terms of the GNU General Public License as published by
+#    the Free Software Foundation, either version 3 of the License, or
+#    (at your option) any later version.
+#
+#    You should have received a copy of the GNU General Public License
+#    along with this program.  If not, see <http://www.gnu.org/licenses/>.
+
+
+# Variables for begin
+VERSION="1.0"
+ARQ_SYS=$( file /bin/bash | cut -d' ' -f3 )
+
+# File Log
+LOGFILE="/var/log/ubuntupackages.log"
+
+
+# Discover UbuntuPackage installation folder
+export RUNDIR=$(dirname "$0")
+
+
+# Change to installation folder in order to correctly source files
+cd "$RUNDIR"
+
+# Source all scripts, functions etc.
+for src in lib/common/*.sh; do source "$src"; done
+for src in lib/*.sh; do source "$src"; done
+
+
+# Discover local language and source the respective lang file if present
+DIS_LANG="${LANG%%.*}"
+EL_LANG="${EL_LANG:-en_US}"
+[[ -f lang/"${EL_LANG}.sh" ]] && source lang/"${EL_LANG}.sh" ||	source lang/en_US.sh
+
+
+# Message Start
+MessageStart
+
+# IsRoot?
+IsRoot
+
+
+# Populate an array with selected functions from Menu (PS: substituting "|" with "")
+FUNCTIONS=(${OPTION//|/})
+
+# Exit if no selection is madse
+[[ -z "${FUNCTIONS[*]}" ]] && End
+
+
+# Run selected functions and log them to a logfile
+# TODO: Implement "logger -p local0.info -f $LOGFILE -t info "Msg here..."
+for GO in ${FUNCTIONS[@]}; do
+
+	"$GO"
+
+done
+
+# End Program
+End
+
+
+
+
+
+
